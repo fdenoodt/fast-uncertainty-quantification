@@ -18,3 +18,8 @@ Interesting resources:
 
   [Machine Learning Lecture 10 "Naive Bayes continued" -Cornell CS4780 SP17 (youtube.com)](https://www.youtube.com/watch?v=rqB0XWoMreU)
 
+
+
+- Images doesn't yet work: maybe if ensure that views "follow different paths" during inference could help.
+  - e.g. through similarity regularization between latent representations of views from same original image
+  - dropout? 
