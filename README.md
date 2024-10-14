@@ -28,3 +28,5 @@ Interesting resources:
 - Images doesn't yet work: maybe if ensure that views "follow different paths" during inference could help.
   - e.g. through similarity regularization between latent representations of views from same original image
   - dropout? 
+
+- Quantifiying uncertainty: https://colab.research.google.com/drive/1AE7g0BDQDcCDx8nzB8dRcm_VyonqhaWG?usp=sharing#scrollTo=590hDb7dBXul, https://www.youtube.com/watch?v=WWATIH5ZACw
