@@ -1,7 +1,8 @@
 # fast-uncertainty-quantification
 
 Interesting resources:
--[Simple and Scalable Predictive Uncertainty
+
+- [Simple and Scalable Predictive Uncertainty
  Estimation using Deep Ensembles](https://proceedings.neurips.cc/paper_files/paper/2017/file/9ef2ed4b7fd2c810847ffa5fa85bce38-Paper.pdf)
 
 - [Deep Generative Modeling | SpringerLink](https://link.springer.com/book/10.1007/978-3-031-64087-2)
