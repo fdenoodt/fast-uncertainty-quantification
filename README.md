@@ -5,6 +5,8 @@ Interesting resources:
 - [Simple and Scalable Predictive Uncertainty
  Estimation using Deep Ensembles](https://proceedings.neurips.cc/paper_files/paper/2017/file/9ef2ed4b7fd2c810847ffa5fa85bce38-Paper.pdf)
 
+- [A Survey on Uncertainty Quantification Methods for Deep Learning](https://arxiv.org/abs/2302.13425)
+
 - [Deep Generative Modeling | SpringerLink](https://link.springer.com/book/10.1007/978-3-031-64087-2)
   book on generative modeling: contains a section on uncertainty quantification (under "hybrid modeling")
 
