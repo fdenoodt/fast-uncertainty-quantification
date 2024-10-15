@@ -4,6 +4,8 @@ import lightning as L
 import torch
 from torch import Tensor
 from torch import nn
+import torch.nn.functional as F
+from torch.utils.data import DataLoader
 
 from shared.loss import Loss
 
@@ -113,3 +115,62 @@ class Classifier(L.LightningModule):
         self.load_state_dict(torch.load(os.path.join(self.h['checkpoint_path'], 'model.pth')))
         self.eval()
         return self
+
+
+class UQ:
+    @staticmethod
+    # Function to compute model's uncertainty (e.g., softmax variance)
+    def compute_uncertainty(outputs):  # outputs: (batch_size, num_classes)
+        # Softmax the output to get probabilities
+        probs = F.softmax(outputs, dim=1)
+
+        # Compute variance (uncertainty) across the class probabilities
+        uncertainty = probs.var(dim=1)
+        return uncertainty
+
+    @staticmethod
+    def _variances_vs_accuracy_per_input_img(classifier: Classifier, batch: Tuple[Tensor, Tensor]) -> Tensor:
+        """Returns tensor of shape (batch, 2),
+        where the first column is the variance and the second column
+        is 1 or 0 if the prediction is correct or not."""
+
+        x, y = batch
+        assert x.dim() == 5  # (batch, nb_views, C, H, W)
+
+        # 1) per view, compute the predictions
+        predictions, _ = classifier.forward_multiple(x)  # (batch_size, num_views, num_classes)
+        assert len(predictions.shape) == 3, f"Predictions shape is {predictions.shape}, expected 3 dimensions."
+
+        # softmax the predictions
+        predictions = F.softmax(predictions, dim=2)  # (batch_size, num_views, num_classes)
+
+        # 2) compute the variance of the predictions
+        variance = predictions.var(dim=1)  # (batch_size, num_classes)
+        average_variance = variance.mean(dim=1)  # (batch_size)
+
+        # 3) get mean of the predictions and take argmax
+        final_predictions = predictions.mean(dim=1).argmax(dim=1)  # (batch_size)
+
+        # 4) compute the accuracy of the mode with the labels
+        accuracy = (final_predictions == y)  # (batch_size)
+
+        # 5) stack the variance and accuracy
+        stack = torch.stack((average_variance, accuracy), dim=1)  # (batch_size, 2)
+        return stack
+
+    @staticmethod
+    def variances_vs_accuracy_per_input_img(classifier: Classifier, data_loader: DataLoader) -> Tensor:
+        """Returns tensor of shape (batch, 2),
+        where the first column is the variance and the second column
+        is 1 or 0 if the prediction is correct or not."""
+
+        classifier.eval()
+        var_vs_accuracy = None
+        for batch in data_loader:
+            batch_var_vs_accuracy = UQ._variances_vs_accuracy_per_input_img(classifier, batch)
+            if var_vs_accuracy is None:
+                var_vs_accuracy = batch_var_vs_accuracy
+            else:
+                var_vs_accuracy = torch.cat((var_vs_accuracy, batch_var_vs_accuracy), dim=0)
+
+        return var_vs_accuracy
