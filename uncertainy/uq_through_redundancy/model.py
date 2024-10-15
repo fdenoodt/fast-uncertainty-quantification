@@ -1,5 +1,5 @@
 import os
-from typing import Tuple
+from typing import Tuple, Optional
 import lightning as L
 import torch
 from torch import Tensor
@@ -105,9 +105,9 @@ class Classifier(L.LightningModule):
     def configure_optimizers(self):
         return torch.optim.Adam(self.parameters(), lr=self.h['learning_rate'])
 
-    def save(self) -> None:
+    def save(self, name: Optional[str] = 'model.pth') -> None:
         os.makedirs(self.h['checkpoint_path'], exist_ok=True)
-        torch.save(self.state_dict(), os.path.join(self.h['checkpoint_path'], 'model.pth'))
+        torch.save(self.state_dict(), os.path.join(self.h['checkpoint_path'], name))
 
     def load(self) -> 'SimpleNet':
         self.load_state_dict(torch.load(os.path.join(self.h['checkpoint_path'], 'model.pth')))
