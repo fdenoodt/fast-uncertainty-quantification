@@ -4,7 +4,7 @@ import wandb
 import torch
 import gc
 
-from shared.utils import set_seed, get_wandb_project_name, initialize_wandb, retrieve_existing_wandb_run_id
+from shared.utils import set_seed, W
 
 
 def timer_decorator(func):
@@ -33,8 +33,8 @@ def wandb_decorator(func):
              "    ...")
 
         if h['use_wandb']:
-            entity, project_name, run_name = get_wandb_project_name(h)
-            initialize_wandb(h, entity, project_name, run_name)
+            entity, project_name, run_name = W.get_wandb_project_name(h)
+            W.initialize_wandb(h, entity, project_name, run_name)
 
         result = func(h, *args, **kwargs)
 
@@ -51,7 +51,7 @@ def wandb_resume_decorator(func):
             ("See `wandb_decorator` for more information.")
 
         if h['use_wandb']:
-            run_id, project_name = retrieve_existing_wandb_run_id(h)
+            run_id, project_name = W.retrieve_existing_wandb_run_id(h)
             wandb.init(id=run_id, resume="allow", project=project_name, entity=h['wandb_entity'])
 
         result = func(h, *args, **kwargs)

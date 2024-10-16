@@ -13,7 +13,7 @@ from uncertainty.uq_through_redundancy.model import UQ
 class Visual:
     class DiscrDistr:
         @staticmethod
-        def variances_per_wrong_or_correct_pred(var_vs_accuracy: Tensor):
+        def correct_vs_wrong(var_vs_accuracy: Tensor):
             variances = var_vs_accuracy[:, 0].numpy()  # scalar values
             accuracies = var_vs_accuracy[:, 1].numpy()  # 0 or 1s
 
@@ -39,8 +39,10 @@ class Visual:
             plt.show()
             plt.close(fig)
 
+            return fig
+
         @staticmethod
-        def variances_per_wrong_or_correct_pred_normalized(var_vs_accuracy: Tensor):
+        def correct_vs_wrong_normalized(var_vs_accuracy: Tensor):
             variances = var_vs_accuracy[:, 0].numpy()  # scalar values
             accuracies = var_vs_accuracy[:, 1].numpy()  # 0 or 1s
 
@@ -66,9 +68,11 @@ class Visual:
             plt.show()
             plt.close(fig)
 
+            return fig
+
     class ContinDistr:
         @staticmethod
-        def variances_per_wrong_or_correct_pred(var_vs_accuracy: Tensor):
+        def correct_vs_wrong(var_vs_accuracy: Tensor):
             variances = var_vs_accuracy[:, 0].numpy()  # scalar values
             accuracies = var_vs_accuracy[:, 1].numpy()  # 0 or 1s
 
@@ -93,6 +97,8 @@ class Visual:
 
             plt.show()
             plt.close(fig)
+
+            return fig
 
     @staticmethod
     def plot_uncertainty_vs_noise_level(model, test_loader):
@@ -123,6 +129,8 @@ class Visual:
         plt.grid(True)
         plt.show()
 
+        return plt.gcf()
+
     @staticmethod
     def show_transformations(h):
         # dispay the different subsampling methods, same image repeated 3 times
@@ -144,3 +152,5 @@ class Visual:
             plt.imshow(imgs.squeeze(0), cmap='gray')
             plt.title(method.__name__)
             plt.show()
+
+        return plt.gcf()

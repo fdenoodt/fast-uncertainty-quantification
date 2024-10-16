@@ -4,3 +4,6 @@ data/*
 *.pyc
 *.pth
 .idea/*
+wandb/*
+lightning_logs/*
+logs/*

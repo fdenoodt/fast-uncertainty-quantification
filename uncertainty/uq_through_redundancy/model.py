@@ -79,6 +79,7 @@ class Classifier(L.LightningModule):
         y_hat, latent_representations = self(x)  # (batch, nb_views, num_classes)
 
         loss = self.loss(y_hat, y, latent_representations, x.size(1))
+        self.log('train_loss', loss, batch_size=x.size(0))
         return loss
 
     def validation_step(self, batch, batch_idx):
@@ -86,6 +87,7 @@ class Classifier(L.LightningModule):
         y_hat, latent_representations = self(x)
 
         loss = self.loss(y_hat, y, latent_representations, x.size(1))
+        self.log('val_loss', loss, batch_size=x.size(0))
         return loss
 
     def test_step(self, batch, batch_idx):
@@ -94,14 +96,11 @@ class Classifier(L.LightningModule):
 
         loss = self.loss(y_hat, y, latent_representations, x.size(1))
 
-        # torch.Size([32, 5, 10]) torch.Size([32, 5])
-        # print(y_hat.shape, y.shape)
-        # acc = (y_hat.argmax(dim=1) == y).float().mean()
         y_hat_mean = y_hat.mean(dim=1)
         acc = (y_hat_mean.argmax(dim=1) == y).float().mean()
-        # acc = (y_hat_mean.argmax(dim=1) == y[:, 0]).float().mean()
 
         self.log('test_acc', acc)
+        self.log('test_loss', loss)
         return loss
 
     def configure_optimizers(self):
@@ -159,14 +158,24 @@ class UQ:
         return stack
 
     @staticmethod
-    def variances_vs_accuracy_per_input_img(classifier: Classifier, data_loader: DataLoader) -> Tensor:
+    def variances_vs_accuracy_per_input_img(classifier: Classifier, data_loader: DataLoader,
+                                            limit_batches: float) -> Tensor:
         """Returns tensor of shape (batch, 2),
         where the first column is the variance and the second column
         is 1 or 0 if the prediction is correct or not."""
 
+        assert 0 <= limit_batches <= 1, f"limit_batches must be between 0 and 1, got {limit_batches}."
+
         classifier.eval()
         var_vs_accuracy = None
-        for batch in data_loader:
+
+        total_batches = len(data_loader)
+        num_batches_to_process = int(total_batches * limit_batches)
+
+        for i, batch in enumerate(data_loader):
+            if i >= num_batches_to_process:
+                break
+
             batch_var_vs_accuracy = UQ._variances_vs_accuracy_per_input_img(classifier, batch)
             if var_vs_accuracy is None:
                 var_vs_accuracy = batch_var_vs_accuracy
