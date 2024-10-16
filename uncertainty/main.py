@@ -52,7 +52,7 @@ def analysis(h: dict, c: Classifier, trainer: Trainer, val_loader):
 
     W.log_im(
         h,
-        Visual.plot_uncertainty_vs_noise_level(c, val),
+        Visual.plot_uncertainty_vs_noise_level(c, val, limit_batches=h['limit_val_batches']),
         "Uncertainty_vs_noise_level")
 
 

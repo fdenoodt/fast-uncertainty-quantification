@@ -7,6 +7,7 @@ from torch import nn
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 
+from shared.data import filter_iterator
 from shared.loss import Loss
 
 
@@ -169,13 +170,7 @@ class UQ:
         classifier.eval()
         var_vs_accuracy = None
 
-        total_batches = len(data_loader)
-        num_batches_to_process = int(total_batches * limit_batches)
-
-        for i, batch in enumerate(data_loader):
-            if i >= num_batches_to_process:
-                break
-
+        for i, batch in filter_iterator(data_loader, limit_batches):
             batch_var_vs_accuracy = UQ._variances_vs_accuracy_per_input_img(classifier, batch)
             if var_vs_accuracy is None:
                 var_vs_accuracy = batch_var_vs_accuracy

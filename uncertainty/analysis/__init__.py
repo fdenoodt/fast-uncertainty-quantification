@@ -6,6 +6,7 @@ from torch import Tensor
 from torchvision import transforms
 from torchvision.datasets import MNIST
 
+from shared.data import filter_iterator
 from shared.data.transformations import Noise, T
 from uncertainty.uq_through_redundancy.model import UQ
 
@@ -31,11 +32,6 @@ class Visual:
             ax.set_title("Variance Distribution for Correct vs Wrong Predictions")
             ax.legend()
 
-            # Log the matplotlib figure to wandb
-            # if options.use_wandb:
-            #     wandb_section = get_wandb_audio_classific_key(opt, classifier_config)
-            #     wandb.log({f"{wandb_section}_softmax/variance_distribution_combined": wandb.Image(fig)})
-
             plt.show()
             plt.close(fig)
 
@@ -59,11 +55,6 @@ class Visual:
             ax.set_ylabel("Density")
             ax.set_title("Variance Distribution for Correct vs Wrong Predictions")
             ax.legend()
-
-            # Log the matplotlib figure to wandb
-            # if options.use_wandb:
-            #     wandb_section = get_wandb_audio_classific_key(opt, classifier_config)
-            #     wandb.log({f"{wandb_section}_softmax/variance_distribution_combined": wandb.Image(fig)})
 
             plt.show()
             plt.close(fig)
@@ -90,18 +81,15 @@ class Visual:
             ax.set_title("Variance Distribution for Correct vs Wrong Predictions")
             ax.legend()
 
-            # Log the matplotlib figure to wandb
-            # if options.use_wandb:
-            #     wandb_section = get_wandb_audio_classific_key(opt, classifier_config)
-            #     wandb.log({f"{wandb_section}_softmax/variance_distribution_combined": wandb.Image(fig)})
-
             plt.show()
             plt.close(fig)
 
             return fig
 
     @staticmethod
-    def plot_uncertainty_vs_noise_level(model, test_loader):
+    def plot_uncertainty_vs_noise_level(model, test_loader, limit_batches: float):
+        assert 0 <= limit_batches <= 1, f"limit_batches must be between 0 and 1, got {limit_batches}."
+
         model.eval()
 
         # List to store noise levels and corresponding uncertainty values
@@ -111,7 +99,7 @@ class Visual:
         for noise_factor in noise_levels:
             all_uncertainties = []
 
-            for images, _ in test_loader:
+            for i, (images, _) in filter_iterator(test_loader, limit_batches):
                 noisy_images = Noise.add_gaussian_noise(images, noise_factor)
                 with torch.no_grad():
                     outputs, _ = model(noisy_images)
