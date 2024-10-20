@@ -7,8 +7,8 @@ class W:  # W for wandb
     def get_wandb_project_name(h: dict):
         assert h['method'] in ['uq_through_redundancy', 'ensemble']
 
-        project_name = f"{h['method']}_{h['redundancy_method']}_{h['dataset']}_{h['wandb_project_name']}"
-        run_name = f"m={h['method']} alpha={h['alpha']} nb_views={h['num_views']}"  # f"{family}_kld={options.encoder_config.kld_weight}_lr={options.encoder_config.learning_rate}_{int(time.time())}"
+        project_name = f"{h['method']}_{h['dataset']}_{h['wandb_project_name']}"
+        run_name = f"m={h['method']} {h['redundancy_method']} alpha={h['alpha']} nb_views={h['num_views']}"
         entity = h['wandb_entity']
         # replace empty string with None
         entity = entity if entity != "" else None
@@ -59,3 +59,8 @@ class W:  # W for wandb
         # if options.use_wandb:
         #     wandb_section = get_wandb_audio_classific_key(opt, classifier_config)
         #     wandb.log({f"{wandb_section}_softmax/variance_distribution_combined": wandb.Image(fig)})
+
+    @staticmethod
+    def log_x_y(h: dict, x, y, name: str):
+        if h['use_wandb']:
+            wandb.log({name: [wandb.Image(x, caption=y)]})
