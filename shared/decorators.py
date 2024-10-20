@@ -75,7 +75,6 @@ def init_decorator(func):
 
         create_path_if_not_exists(h['dataset_path'])
         create_path_if_not_exists(h['log_path'])
-        create_path_if_not_exists(h['model_path'])
 
     def wrapper(h: dict, *args, **kwargs):
         assert type(h) == dict, \
