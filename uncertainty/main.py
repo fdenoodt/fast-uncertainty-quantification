@@ -8,8 +8,9 @@ from shared.hyperparameters import Hyperparameters
 from shared.loss import Loss
 from shared.wandb import W  # wandb wrapper
 
-from uncertainty.analysis import Visual
-from uncertainty.uq_through_redundancy.model import Classifier, UQ
+from uncertainty.analysis.visual import Visual
+from uncertainty.uq_through_redundancy.model import Classifier
+from uncertainty.analysis.uq import UQ
 
 
 def train(h: dict, c: Classifier, trainer: Trainer, train_loader, val_loader):
@@ -33,27 +34,33 @@ def analysis(h: dict, c: Classifier, trainer: Trainer, val_loader):
     train, val = data_loaders(
         h, [lambda _: T.create_multiple_views(_, h['num_views'], T.retrieve_transforms(h))])
 
-    # (batch_size, 2) where 1st column is variance and 2nd is 1 or 0 if the prediction is correct or not
-    res = UQ.variances_vs_accuracy_per_input_img(c, val, limit_batches=h['limit_val_batches'])
+    if h['num_views'] > 1:
+        # (batch_size, 2) where 1st column is variance and 2nd is 1 or 0 if the prediction is correct or not
+        res = UQ.variances_vs_accuracy_per_input_img(c, val, limit_batches=h['limit_val_batches'])
 
-    W.log_im(
-        h,
-        Visual.DiscrDistr.correct_vs_wrong(res.detach()),
-        "DiscrDistr")
-    W.log_im(
-        h,
-        Visual.ContinDistr.correct_vs_wrong(res.detach()),
-        "ContinDistr")
+        W.log_im(
+            h,
+            Visual.DiscrDistr.correct_vs_wrong(res.detach()),
+            "DiscrDistr")
+        W.log_im(
+            h,
+            Visual.ContinDistr.correct_vs_wrong(res.detach()),
+            "ContinDistr")
 
-    W.log_im(
-        h,
-        Visual.DiscrDistr.correct_vs_wrong_normalized(res.detach()),
-        "DiscrDistr_normalized")
+        W.log_im(
+            h,
+            Visual.DiscrDistr.correct_vs_wrong_normalized(res.detach()),
+            "DiscrDistr_normalized")
 
+    noise_levels, mean_entropies = UQ.retrieve_entropy_data(c, val, limit_batches=h['limit_val_batches'])
     W.log_im(
         h,
-        Visual.plot_uncertainty_vs_noise_level(c, val, limit_batches=h['limit_val_batches']),
-        "Uncertainty_vs_noise_level")
+        Visual.plot_uncertainty_vs_noise_level(noise_levels, mean_entropies),
+        "Entropy_vs_noise_level_fig")
+
+    W.log_x_y(h, noise_levels, mean_entropies, "Entropy_vs_noise_level",
+              x_label="Noise Level (std dev of Gaussian noise)",
+              y_label="Mean Entropy (Model Uncertainty)")
 
 
 @init_decorator

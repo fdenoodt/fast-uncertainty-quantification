@@ -1,4 +1,6 @@
 import os
+
+import numpy as np
 import wandb
 
 
@@ -61,6 +63,17 @@ class W:  # W for wandb
         #     wandb.log({f"{wandb_section}_softmax/variance_distribution_combined": wandb.Image(fig)})
 
     @staticmethod
-    def log_x_y(h: dict, x, y, name: str):
+    def log_x_y(h: dict, x_values: np.ndarray, y_values: np.ndarray, name: str, x_label: str, y_label: str):
         if h['use_wandb']:
-            wandb.log({name: [wandb.Image(x, caption=y)]})
+            data = [[x, y] for (x, y) in zip(x_values, y_values)]
+            table = wandb.Table(data=data, columns=[x_label, y_label])
+            wandb.log(
+                {
+                    name: wandb.plot.line(
+                        table, "x", "y", title=name
+                    )
+                }
+            )
+            # wandb.log({"x": x.tolist(),
+            #            "y": y.tolist()},
+            #           )

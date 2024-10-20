@@ -42,7 +42,7 @@ class Hyperparameters:
             'wandb_project_name': 'test',
 
             'train': True,  # Set this to false if you only want to evaluate the model
-            'fast_dev_run': False,
+            'fast_dev_run': True,
             'overfit_batches': 0.0
         }
         h['checkpoint_path'] = f"{h['log_path']}/saved_models"
