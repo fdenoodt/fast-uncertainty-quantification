@@ -31,7 +31,7 @@ def analysis(h: dict, c: Classifier, trainer: Trainer, val_loader):
 
     c.eval()
     train, val = data_loaders(
-        h, [lambda _: T.create_multiple_views(_, h['num_views'], T.subsample_with_random_transform)])
+        h, [lambda _: T.create_multiple_views(_, h['num_views'], T.retrieve_transforms(h))])
 
     # (batch_size, 2) where 1st column is variance and 2nd is 1 or 0 if the prediction is correct or not
     res = UQ.variances_vs_accuracy_per_input_img(c, val, limit_batches=h['limit_val_batches'])
@@ -62,7 +62,7 @@ def analysis(h: dict, c: Classifier, trainer: Trainer, val_loader):
 def main(h: dict):
     train_loader, val_loader = data_loaders(
         h,
-        [lambda _: T.create_multiple_views(_, h['num_views'], T.subsample_with_random_transform)])
+        [lambda _: T.create_multiple_views(_, h['num_views'], T.retrieve_transforms(h))])
 
     c = Classifier(
         h=h,  # Hyperparameters

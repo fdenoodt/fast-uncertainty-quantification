@@ -4,6 +4,16 @@ import torchvision.transforms.functional as TF
 
 
 class T:
+
+    @staticmethod
+    def retrieve_transforms(h: dict) -> callable:
+        transform = h['redundancy_method']
+        if transform == 'random_transform':
+            trans_func: callable = T.subsample_with_random_transform
+        else:
+            raise ValueError(f"Unknown transform: {transform}")  # TODO: add more transforms
+        return trans_func
+
     @staticmethod
     def subsample(x: torch.Tensor, downscale_factor=2, noise_factor=0.05):
         assert x.dim() == 3  # (C, H, W)

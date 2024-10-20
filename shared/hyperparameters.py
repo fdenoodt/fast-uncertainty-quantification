@@ -7,7 +7,7 @@ class Hyperparameters:
     def get():
         h = {  # hyperparameters
             'method': 'uq_through_redundancy',  # uq_through_redundancy, ensemble
-            'redundancy_method': 'aug_rotate',  # augmentations, splitting into chunks, etc.
+            'redundancy_method': 'random_transform',  # augmentations, splitting into chunks, etc.
 
             'dataset': 'MNIST',  # 'TOY_REGRESSION', 'RADIO',
             'dataset_path': '../data/',
