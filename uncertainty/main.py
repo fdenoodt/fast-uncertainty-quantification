@@ -1,12 +1,12 @@
 from lightning import Trainer
 from lightning.pytorch.loggers import WandbLogger
 
-from shared import Hyperparameters
 from shared.data.data_loader import data_loaders
 from shared.data.transformations import T
 from shared.decorators import init_decorator, wandb_decorator, timer_decorator
+from shared.hyperparameters import Hyperparameters
 from shared.loss import Loss
-from shared.utils import W  # wandb wrapper
+from shared.wandb import W  # wandb wrapper
 
 from uncertainty.analysis import Visual
 from uncertainty.uq_through_redundancy.model import Classifier, UQ

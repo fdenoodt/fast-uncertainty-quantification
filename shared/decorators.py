@@ -4,7 +4,8 @@ import wandb
 import torch
 import gc
 
-from shared.utils import set_seed, W, create_path_if_not_exists
+from shared.utils import set_seed, create_path_if_not_exists
+from shared.wandb import W  # wandb wrapper
 
 
 def timer_decorator(func):
