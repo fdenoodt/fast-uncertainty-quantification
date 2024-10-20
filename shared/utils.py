@@ -2,6 +2,12 @@ import torch
 import numpy as np
 import os
 import wandb
+import os
+
+
+def create_path_if_not_exists(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
 
 
 def set_seed(seed):

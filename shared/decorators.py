@@ -4,7 +4,7 @@ import wandb
 import torch
 import gc
 
-from shared.utils import set_seed, W
+from shared.utils import set_seed, W, create_path_if_not_exists
 
 
 def timer_decorator(func):
@@ -72,6 +72,10 @@ def init_decorator(func):
 
         # set random seeds
         set_seed(h['seed'])
+
+        create_path_if_not_exists(h['dataset_path'])
+        create_path_if_not_exists(h['log_path'])
+        create_path_if_not_exists(h['model_path'])
 
     def wrapper(h: dict, *args, **kwargs):
         assert type(h) == dict, \
