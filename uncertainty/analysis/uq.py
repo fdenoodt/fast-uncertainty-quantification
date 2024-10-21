@@ -20,9 +20,11 @@ class UQ:  # Uncertainty Quantification
         in: outputs: (batch_size, nb_views, num_classes)
         out: uncertainty: (batch_size)
         """
+        assert outputs.dim() == 3, f"Expected 3 dimensions, got {outputs.dim()}."
+
         # outputs: (batch_size, nb_views, num_classes)
         # Softmax the output to get probabilities
-        probs = F.softmax(outputs, dim=1)  # (batch_size, nb_views, num_classes)
+        probs = F.softmax(outputs, dim=2)  # (batch_size, nb_views, num_classes)
 
         # Compute variance (uncertainty) across the class probabilities
         # uncertainty = probs.var(dim=1) # (batch_size, num_classes)
